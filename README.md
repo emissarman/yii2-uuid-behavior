@@ -7,7 +7,7 @@ Behavior to generate UUID values (mostly, for ActiveRecord primary key).
 ## Installation
 Using [packagist.org](https://packagist.org/packages/horat1us/yii2-uuid-behavior):
 ```bash
-composer require wearesho-team/yii2-uuid-behavior:^1.0
+composer require horat1us/yii2-uuid-behavior:^1.0
 ```
 
 ## Usage
