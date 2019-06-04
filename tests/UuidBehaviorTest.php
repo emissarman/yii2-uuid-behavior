@@ -17,7 +17,7 @@ use yii\db;
  */
 class UuidBehaviorTest extends TestCase
 {
-    protected const TEST_UUID = '059b012d-8270-49a4-bf7a-e394fba207ec';
+    public const TEST_UUID = '059b012d-8270-49a4-bf7a-e394fba207ec';
 
     public function testEvents(): void
     {
@@ -61,6 +61,31 @@ class UuidBehaviorTest extends TestCase
 
         $behavior = new UuidBehavior([
             'factory' => $factory,
+        ]);
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $behavior->generateUuid($event);
+
+        $this->assertEquals(static::TEST_UUID, $sender->uuid);
+    }
+
+    public function testPreserveNonEmptyValue(): void
+    {
+        $sender = new class
+        {
+            /** @var string */
+            public $uuid = UuidBehaviorTest::TEST_UUID;
+        };
+        $event = new base\Event(['name' => db\ActiveRecord::EVENT_BEFORE_INSERT, 'sender' => $sender,]);
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $factory = $this->createMock(UuidFactory::class);
+
+        $factory
+            ->expects($this->never())
+            ->method('uuid4');
+
+        $behavior = new UuidBehavior([
+            'factory' => $factory,
+            'preserveNonEmptyValues' => true,
         ]);
         /** @noinspection PhpUnhandledExceptionInspection */
         $behavior->generateUuid($event);
