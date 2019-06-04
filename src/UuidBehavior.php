@@ -23,6 +23,12 @@ class UuidBehavior extends base\Behavior
         db\ActiveRecord::EVENT_BEFORE_INSERT => 'uuid',
     ];
 
+    /**
+     * @var bool whether to preserve non-empty attribute values.
+     * @since 1.1.0
+     */
+    public $preserveNonEmptyValues = false;
+
     public function events(): array
     {
         $keys = array_keys($this->attributes);
@@ -39,12 +45,15 @@ class UuidBehavior extends base\Behavior
             throw new base\InvalidArgumentException("Event {$event->name} is not supported.");
         }
 
+        $attribute = $this->attributes[$event->name];
+        if ($this->preserveNonEmptyValues && !empty($event->sender->{$attribute})) {
+            return;
+        }
+
         /** @var Uuid\UuidFactoryInterface $factory */
         $factory = di\Instance::ensure($this->factory, Uuid\UuidFactoryInterface::class);
 
-        $attribute = $this->attributes[$event->name];
         $value = $factory->uuid4()->toString();
-
         $event->sender->{$attribute} = $value;
     }
 }
